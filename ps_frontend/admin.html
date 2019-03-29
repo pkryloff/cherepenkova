@@ -1,0 +1,408 @@
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+	<title>Admin</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+	<noscript>
+		<link rel="stylesheet" href="assets/css/noscript.css" />
+	</noscript>
+</head>
+
+<body class="is-preload">
+
+	<!-- Wrapper -->
+	<div id="wrapper">
+
+		<!-- Header -->
+		<header id="header">
+			<a href="index.html" class="logo">
+				<strong>Payment System</strong>
+				<span>on Ethereum</span>
+			</a>
+			<nav>
+				<a href="#menu">Меню</a>
+			</nav>
+		</header>
+
+		<!-- Menu -->
+		<nav id="menu">
+			<ul class="links">
+				<li>
+					<a href="index.html">Главная</a>
+				</li>
+				<li>
+					<a href="client.html">Клиент-покупатель</a>
+				</li>
+				<li>
+					<a href="admin.html">Администратор</a>
+				</li>
+				<li>
+					<a href="information.html">Подробнее</a>
+				</li>
+			</ul>
+		</nav>
+
+		<!-- Main -->
+		<div id="main" class="alt">
+
+			<!-- One -->
+			<section id="one">
+				<div class="inner">
+					<header class="major">
+						<h1>Администратору</h1>
+					</header>
+					<h2>Информация о системе</h2>
+					<div id="countOfUsers" style="font-size: 130%"></div>
+
+					<div id="overdraftLimit" style="font-size: 130%"></div>
+
+					<hr>
+					<h2>Регистрация пользователя</h2>
+					<input type="text" name="regEthAdr" id="regEthAdr" value="" placeholder="Eth адрес владельца" size="45">
+					<br>
+					<input type="text" name="regOwner" id="regOwner" value="" placeholder="Владелец" size="45">
+					<br>
+					<input type="text" name="regBalance" id="regBalance" value="" placeholder="Баланс" size="45">
+					<br>
+					<button id="Register">Зарегистрировать</button>
+					<div id="status" style="font-size: 150%; color: chartreuse"></div>
+					<br>
+					<hr>
+					<h2>Установить овердрафт</h2>
+					<input type="text" name="overdrSum" id="overdrSum" value="" placeholder="Сумма" size="45">
+					<br>
+					<button id="setOverdraft">Установить</button>
+					<div id="status1" style="font-size: 150%; color: chartreuse"></div>
+					<hr>
+					<h2>Пополнение счетов пользователей</h2>
+					<input type="text" name="changingAdr" id="changingAdr" value="" placeholder="Счет пользователя" size="45">
+					<br>
+					<input type="text" name="changingVal" id="changingVal" value="" placeholder="Сумма" size="45">
+
+					<br>
+					<button id="Transfer">Пополнить</button>
+				</div>
+			</section>
+
+		</div>
+
+		<!-- Footer -->
+		<footer id="footer">
+			<div class="inner">
+				<ul class="icons">
+					<li>
+						<a href="#" class="icon alt fa-facebook">
+							<span class="label">Facebook</span>
+						</a>
+					</li>
+					<li>
+						<a href="#" class="icon alt fa-github">
+							<span class="label">GitHub</span>
+						</a>
+					</li>
+					<li>
+						<a href="#" class="icon alt fa-linkedin">
+							<span class="label">LinkedIn</span>
+						</a>
+					</li>
+				</ul>
+				<ul class="copyright">
+					<li>&copy; Untitled</li>
+					<li>Design:
+						<a href="https://html5up.net">HTML5 UP</a>
+					</li>
+				</ul>
+			</div>
+		</footer>
+
+
+	</div>
+
+	<!-- Scripts -->
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/jquery.scrolly.min.js"></script>
+	<script src="assets/js/jquery.scrollex.min.js"></script>
+	<script src="assets/js/browser.min.js"></script>
+	<script src="assets/js/breakpoints.min.js"></script>
+	<script src="assets/js/util.js"></script>
+	<script src="assets/js/main.js"></script>
+
+	<script>
+		if (typeof web3 === 'undefined') {
+			alert("Включите Metamask")
+		}
+		else {
+
+			var abi = [
+				{
+					"constant": false,
+					"inputs": [
+						{
+							"name": "AccountId",
+							"type": "uint256"
+						},
+						{
+							"name": "changingValue",
+							"type": "int256"
+						}
+					],
+					"name": "ChangeAcc",
+					"outputs": [],
+					"payable": false,
+					"stateMutability": "nonpayable",
+					"type": "function"
+				},
+				{
+					"constant": false,
+					"inputs": [
+						{
+							"name": "_balance",
+							"type": "int256"
+						},
+						{
+							"name": "_owner",
+							"type": "address"
+						},
+						{
+							"name": "_fullNameOfOwner",
+							"type": "string"
+						}
+					],
+					"name": "CreateAcc",
+					"outputs": [],
+					"payable": false,
+					"stateMutability": "nonpayable",
+					"type": "function"
+				},
+				{
+					"constant": false,
+					"inputs": [
+						{
+							"name": "AccountId",
+							"type": "uint256"
+						},
+						{
+							"name": "flag",
+							"type": "bool"
+						}
+					],
+					"name": "makeUserBanned",
+					"outputs": [],
+					"payable": false,
+					"stateMutability": "nonpayable",
+					"type": "function"
+				},
+				{
+					"constant": false,
+					"inputs": [
+						{
+							"name": "AccountId",
+							"type": "uint256"
+						},
+						{
+							"name": "flag",
+							"type": "bool"
+						}
+					],
+					"name": "makeUserDebtor",
+					"outputs": [],
+					"payable": false,
+					"stateMutability": "nonpayable",
+					"type": "function"
+				},
+				{
+					"constant": false,
+					"inputs": [
+						{
+							"name": "AccountId",
+							"type": "uint256"
+						},
+						{
+							"name": "value",
+							"type": "int256"
+						}
+					],
+					"name": "repayOverdraft",
+					"outputs": [],
+					"payable": false,
+					"stateMutability": "nonpayable",
+					"type": "function"
+				},
+				{
+					"constant": false,
+					"inputs": [
+						{
+							"name": "newLimit",
+							"type": "int256"
+						}
+					],
+					"name": "SetOverdraftLimit",
+					"outputs": [],
+					"payable": false,
+					"stateMutability": "nonpayable",
+					"type": "function"
+				},
+				{
+					"constant": false,
+					"inputs": [
+						{
+							"name": "AccountIdFrom",
+							"type": "uint256"
+						},
+						{
+							"name": "AccountIdTo",
+							"type": "uint256"
+						},
+						{
+							"name": "value",
+							"type": "int256"
+						}
+					],
+					"name": "Transfer",
+					"outputs": [
+						{
+							"name": "",
+							"type": "bool"
+						}
+					],
+					"payable": false,
+					"stateMutability": "nonpayable",
+					"type": "function"
+				},
+				{
+					"inputs": [],
+					"payable": false,
+					"stateMutability": "nonpayable",
+					"type": "constructor"
+				},
+				{
+					"constant": true,
+					"inputs": [
+						{
+							"name": "",
+							"type": "uint256"
+						}
+					],
+					"name": "Accounts",
+					"outputs": [
+						{
+							"name": "accountId",
+							"type": "uint256"
+						},
+						{
+							"name": "owner",
+							"type": "address"
+						},
+						{
+							"name": "fullNameOfOwner",
+							"type": "string"
+						},
+						{
+							"name": "balance",
+							"type": "int256"
+						},
+						{
+							"name": "overdraft",
+							"type": "int256"
+						},
+						{
+							"name": "isBanned",
+							"type": "bool"
+						},
+						{
+							"name": "isDebtor",
+							"type": "bool"
+						}
+					],
+					"payable": false,
+					"stateMutability": "view",
+					"type": "function"
+				},
+				{
+					"constant": true,
+					"inputs": [],
+					"name": "countOfAccounts",
+					"outputs": [
+						{
+							"name": "",
+							"type": "uint256"
+						}
+					],
+					"payable": false,
+					"stateMutability": "view",
+					"type": "function"
+				},
+				{
+					"constant": true,
+					"inputs": [],
+					"name": "overdraftLimit",
+					"outputs": [
+						{
+							"name": "",
+							"type": "int256"
+						}
+					],
+					"payable": false,
+					"stateMutability": "view",
+					"type": "function"
+				}
+			]
+			var adress = "0x282f303b1c8204458ff2204333ba6f9caace57f2"
+			var psConract = web3.eth.contract(abi).at(adress)
+			psConract.countOfAccounts.call((e, r) => {
+				console.log(r['c'][0])
+				document.getElementById('countOfUsers').innerHTML = "Количество пользователей в системе: " + r['c'][0];
+			})
+			psConract.overdraftLimit.call((e, r) => {
+				console.log(r['c'][0])
+				document.getElementById('overdraftLimit').innerHTML = "Установленный лимит овердрафта: " + r['c'][0];
+			})
+
+
+			$("#Register").click(function () {
+				var regBalance = parseInt(document.getElementById("regBalance").value)
+				var regEthAdr = document.getElementById("regEthAdr").value
+				var regOwner = document.getElementById("regOwner").value
+
+				psConract.CreateAcc(regBalance, regEthAdr, regOwner, function (e, myTxHash) {
+					document.getElementById('status').innerHTML = "Подождите, информация записывается блокчейн";
+					console.log("Подождите, информация записывается в блокчейн")
+					web3.eth.filter('latest', function (error, result) {
+						web3.eth.getBlock(result, (e, b) => {
+							var t = b.transactions
+							for (var i = 0; i < t.length; i++)
+								if (t[i] == myTxHash) {
+									console.log("Пользователь успешно добавлен")
+									document.getElementById('status').innerHTML = "Пользователь успешно добавлен";
+								}
+						})
+					})
+
+				})
+			})
+			$("#setOverdraft").click(function () {
+				var overdraftSum = parseInt(document.getElementById("overdrSum").value)
+				psConract.SetOverdraftLimit(overdraftSum, function (e, myTxHash) {
+					document.getElementById('status').innerHTML = "Подождите, информация записывается блокчейн";
+					console.log("Подождите, информация записывается в блокчейн")
+					web3.eth.filter('latest', function (error, result) {
+						web3.eth.getBlock(result, (e, b) => {
+							var t = b.transactions
+							for (var i = 0; i < t.length; i++)
+								if (t[i] == myTxHash) {
+									console.log("Овердрафт успешно установлен")
+									document.getElementById('status1').innerHTML = "Овердрафт успешно установлен";
+								}
+						})
+					})
+				})
+			})
+		}
+	</script>
+</body>
+
+</html>
